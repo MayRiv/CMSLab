@@ -1,0 +1,4 @@
+<div id="content">
+<h1><?=$obj["title"]?></h1>
+<p><?=$obj["body"]?></p>
+</div>
