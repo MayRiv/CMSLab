@@ -1,5 +1,5 @@
 <?php
-
+	require("Page.inc");
 class System 
 {
 	private static $_instance;
@@ -22,16 +22,20 @@ class System
 					<link rel=\"stylesheet\" type=\"text/css\" href=\"css\feed.css\"/>
 				</head>
 				<body>";
+
+		$p = new Page($id);
+		while($p->instanceOf != null)
+		{
+			$p = new Page($p->instanceOf);
+		}
 		$this->showHeader();
 		$this->showMenu($this->getParents($id));
-		$page = SQL("select * from news where id=?",array($id))->next();
-		$this->showContent($page);
+		
+		$this->showContent($p);
 		$this->showFooter();
 
 		echo "	</body>
 			  </html>";
-		//$page = new NewsPage($result->getAll()[0]);
-
 	}
 	public function showHeader()
 	{
@@ -42,25 +46,37 @@ class System
 	{
 		getView("Footer.inc",null);
 	}
-	public function showContent($content)
+	public function showContent($page)
 	{
+	
+		$content = array('title' =>$page->title,'body'=>$page->body );
 		getView("Content.inc",$content);	
 	}
 
 	private function showMenu($parentPages, $parent = null, $level = 1)
-	{
-		
+	{	
 		$margin = 10;
 
 		if ($parent == null) 
 			$pages = SQL("Select * from news where ISNULL(parentId)",null)->getAll();
 		else 
-			$pages = SQL("Select * from news where parentId = ? order by ?",array($parent["id"], $parent["sortField"]))->getAll();
+			$pages = SQL("Select * from news where parentId = ? order by ".$parent["sortField"],array($parent["id"]))->getAll();
 		
-	
+		
+		
+
+
 		for ($i=0; $i < count($pages); $i++) { 
-			echo "<div style=\"margin:" . $level * $margin . "px \"><a href=\"index.php?pageId=" . $pages[$i]["id"]
-			."\">" . $pages[$i]["title"] . "</a></div>";
+			if ($pages[$i]["instanceOf"] != null)
+				$page = new Page($pages[$i]["instanceOf"]);
+			else 
+				$page = new Page($pages[$i]["id"]);
+			
+			$title = $page->title;
+			$id = $page->id;
+
+			echo "<div style=\"margin:" . $level * $margin . "px \"><a href=\"index.php?pageId=" .$id
+			."\">" . $title . "</a></div>";
 			if (in_array($pages[$i], $parentPages))
 				$this->showMenu($parentPages,$pages[$i], $level + 1);
 		}

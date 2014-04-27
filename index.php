@@ -1,5 +1,5 @@
 <?php
-	require("News.inc");
+
 	require("viewer.inc");
 	require("DBManager.inc");
 	require("System.inc");
