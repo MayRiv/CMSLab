@@ -19,18 +19,21 @@ class System
 		
 		echo "<html>
 				<head>
-					<link rel=\"stylesheet\" type=\"text/css\" href=\"css\feed.css\"/>
+					<link rel=\"stylesheet\" type=\"text/css\" href=\"css/feed.css\"/>
+					<meta http-equiv = \"content-language\" content = \"ru\" />
 				</head>
 				<body>";
 
+		
 		$p = new Page($id);
 		while($p->instanceOf != null)
 		{
 			$p = new Page($p->instanceOf);
 		}
 		$this->showHeader();
+		echo "<div id='menu'>";
 		$this->showMenu($this->getParents($id));
-		
+		echo "</div>";
 		$this->showContent($p);
 		$this->showFooter();
 
@@ -40,7 +43,6 @@ class System
 	public function showHeader()
 	{
 		getView("header.inc",null);
-
 	}
 	public function showFooter()
 	{
@@ -56,21 +58,18 @@ class System
 	private function showMenu($parentPages, $parent = null, $level = 1)
 	{	
 		$margin = 10;
-
+		$sortField = $parent["sortField"];
 		if ($parent == null) 
-			$pages = SQL("Select * from news where ISNULL(parentId)",null)->getAll();
+			$pages = SQL("Select * from news where ISNULL(ParentId)",null)->getAll();
 		else 
-			$pages = SQL("Select * from news where parentId = ? order by ".$parent["sortField"],array($parent["id"]))->getAll();
+			$pages = SQL("Select * from news where ParentId = ? order by ".$sortField,array($parent["Id"]))->getAll();
 		
 		
-		
-
-
 		for ($i=0; $i < count($pages); $i++) { 
-			if ($pages[$i]["instanceOf"] != null)
-				$page = new Page($pages[$i]["instanceOf"]);
+			if ($pages[$i]["InstanceOf"] != null)
+				$page = new Page($pages[$i]["InstanceOf"]);
 			else 
-				$page = new Page($pages[$i]["id"]);
+				$page = new Page($pages[$i]["Id"]);
 			
 			$title = $page->title;
 			$id = $page->id;
@@ -88,9 +87,9 @@ class System
 		array_push($parentPages, $page);
 		while(true)
 	  	{	
-	   		$page = SQL('select * from news where id = ?',array($page['parentId']))->next();   		
+	   		$page = SQL('select * from news where id = ?',array($page['ParentId']))->next();   		
 	   		array_push($parentPages, $page);
-	   		if ($page['parentId'] == null) break;
+	   		if ($page['ParentId'] == null) break;
 	  	}
 	  	return $parentPages;
 	}
