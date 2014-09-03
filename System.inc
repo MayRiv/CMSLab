@@ -58,42 +58,78 @@ class System
 	private function showMenu($parentPages, $parent = null, $level = 1)
 	{	
 		$margin = 10;
-		$sortField = $parent["sortField"];
-		if ($parent == null) 
-			$pages = SQL("Select * from news where ISNULL(ParentId)",null)->getAll();
-		else 
-			$pages = SQL("Select * from news where ParentId = ? order by ".$sortField,array($parent["Id"]))->getAll();
-		
-		
+		$pages = $this->getChildPages($parentPages, $parent);
+
 		for ($i=0; $i < count($pages); $i++) { 
 			if ($pages[$i]["InstanceOf"] != null)
 				$page = new Page($pages[$i]["InstanceOf"]);
 			else 
 				$page = new Page($pages[$i]["Id"]);
-			
+		
 			$title = $page->title;
 			$id = $page->id;
 
 			echo "<div style=\"margin:" . $level * $margin . "px \"><a href=\"index.php?pageId=" .$id
 			."\">" . $title . "</a></div>";
-			if (in_array($pages[$i], $parentPages))
+			if (in_array($page, $parentPages))
 				$this->showMenu($parentPages,$pages[$i], $level + 1);
+
 		}
 	}
 	private function getParents($id)
 	{
 		$parentPages = array();
-		$page = SQL("select * from news where id=?",array($id))->next();
-		array_push($parentPages, $page);
-		while(true)
+
+	  	$page = new Page($id);
+	  	array_push($parentPages, $page);
+	  	while($page->parentId != null)
 	  	{	
-	   		$page = SQL('select * from news where id = ?',array($page['ParentId']))->next();   		
+	   		$page = new Page ($page->parentId)   	;	
 	   		array_push($parentPages, $page);
-	   		if ($page['ParentId'] == null) break;
 	  	}
 	  	return $parentPages;
 	}
+	private function getChildPages($parentPages, $parent = null)
+	{
+		$sortField = $parent["sortField"];
+		$query = "Select * from( select * from  news where";
+		$params = array();
+		
+		if ($parent == null)
+		{
+			$query = $query . " ISNULL(ParentId)";
+			array_push($params, null);
+		}
+		else
+		{
+			$query = $query . " ParentId = ? order by " . $sortField;
+			array_push($params, $parent["Id"]);			 
+		}
 
+		$query = $query . ") as t0 ";
+
+		if (isset($_GET['f']))
+		{
+			$filters = explode('-', $_GET['f']);
+			for ($i=0; $i < count($filters); $i++) { 
+				$query = $query .  "JOIN (
+								    SELECT *
+									FROM news
+									INNER JOIN filtervaluesnews ON ( id = newsid )
+									INNER JOIN filtervalues T
+									USING ( filtervalueid )
+									WHERE filtervalueid = " . intval($filters[$i]) ."
+									) AS t2
+									USING ( id ) ";
+
+			}
+		}
+
+		$pages = SQL($query,$params)->getAll();
+		
+		return $pages;
+	}
 }
 
 ?>
+
