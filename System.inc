@@ -34,7 +34,7 @@ class System
 		echo "<div id='menu'>";
 		$this->showMenu($this->getParents($id));
 		echo "</div>";
-		$this->showContent($p);
+		$p->publish();
 		$this->showFooter();
 
 		echo "	</body>
@@ -47,12 +47,6 @@ class System
 	public function showFooter()
 	{
 		getView("Footer.inc",null);
-	}
-	public function showContent($page)
-	{
-	
-		$content = array('title' =>$page->title,'body'=>$page->body );
-		getView("Content.inc",$content);	
 	}
 
 	private function showMenu($parentPages, $parent = null, $level = 1)
@@ -106,27 +100,52 @@ class System
 			array_push($params, $parent["Id"]);			 
 		}
 
-		$query = $query . ") as t0 ";
-
-		if (isset($_GET['f']))
+		$query = $query . ") as t ";
+		
+		
+		/*
+		if (isset($_GET['f']) )
 		{
 			$filters = explode('-', $_GET['f']);
-			for ($i=0; $i < count($filters); $i++) { 
-				$query = $query .  "JOIN (
-								    SELECT *
-									FROM news
-									INNER JOIN filtervaluesnews ON ( id = newsid )
-									INNER JOIN filtervalues T
-									USING ( filtervalueid )
-									WHERE filtervalueid = " . intval($filters[$i]) ."
-									) AS t2
-									USING ( id ) ";
+			$filtersOb = array();
+			
+			$queryFilters = "select * from filtervalues where filtervalueid = ?";
+			
+			for($i=1; $i < count($filters); $i++){
+				$queryFilters = $queryFilters . " or filtervalueid = ? ";
+				
+			}
+			$queryFilters = $queryFilters . " order by filterid";
 
+			$array = SQL($queryFilters, $filters)->getAll();
+			//var_dump($array);
+			//echo $queryFilters;
+			$i = 0;
+			while( $i < count($array)) { 
+				$query = $query . " inner JOIN (
+								   SELECT *
+								   FROM news
+								   INNER JOIN filtervaluesnews ON ( id = newsid )
+								   INNER JOIN filtervalues T
+								   USING ( filtervalueid )
+							       WHERE filtervalueid = " . intval($array[$i]["FilterValueId"]);
+				$j = 0;
+			    while($i + $j < count($array) - 1 && $array[$i + $j]["FilterId"] == $array[$i + 1 + $j]["FilterId"])
+				{
+					$query = $query . " or filtervalueid = " . intval( $array[$i + 1 + $j]["FilterValueId"]);
+					$j++;					
+				}
+				$i += $j;
+				$query = $query . ") AS t" . $i. "
+									USING ( id ) ";
+				$i++;
+				
 			}
 		}
 
+		*/
 		$pages = SQL($query,$params)->getAll();
-		
+		//var_dump($pages);
 		return $pages;
 	}
 }

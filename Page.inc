@@ -6,6 +6,8 @@ class Page
 	public $title;
 	public $instanceOf;
 	public $sortField;
+	public $parentId;
+	public $isContainer;
 	public function __construct($id)
 	{
 		$page = SQL('Select * from news where id = ?', array($id))->getAll()[0];
@@ -15,8 +17,77 @@ class Page
 		$this->instanceOf = $page['InstanceOf'];
 		$this->parentId = $page['ParentId'];
 		$this->sortField = $page['sortField'];
+		$this->isContainer = $page['IsContainer'];
 	}
-	
+	public function publish()
+	{
+
+		if (!$this->isContainer)
+		{
+			$content = array('title' =>$this->title,'body'=>$this->body );
+			getView("Content.inc",$content);
+		}
+		else
+		{
+			$children = $this->getChildren();//SQL('Select * from news where ParentId = ?',array($this->id))->getAll();
+			$content = array();
+			for ($i=0; $i < count($children); $i++) { 
+				array_push($content, array('title' => $children[$i]["Title"], 'id' => $children[$i]["Id"]));
+			}
+
+			//$this->createFilter();
+			getView("Container.inc",$content);
+		}
+	}
+	public function getChildren()
+	{
+		
+		$query = "Select * from(select * from news where parentId =  ?) as m0";
+
+		$params = array();
+		
+		array_push($params, $this->id);
+		if (isset($_GET['f']) )
+		{
+
+			$filters = explode('-', $_GET['f']);
+			$filtersOb = array();
+			
+			$queryFilters = "select * from filtervalues where filtervalueid = ?";
+			
+			for($i=1; $i < count($filters); $i++){
+				$queryFilters = $queryFilters . " or filtervalueid = ? ";
+				
+			}
+			$queryFilters = $queryFilters . " order by filterid";
+
+			$array = SQL($queryFilters, $filters)->getAll();
+			
+			$i = 0;
+			while( $i < count($array)) { 
+				$query = $query . " inner JOIN (
+								   SELECT *
+								   FROM news
+								   INNER JOIN filtervaluesnews ON ( id = newsid )
+								   INNER JOIN filtervalues T
+								   USING ( filtervalueid )
+							       WHERE filtervalueid = " . intval($array[$i]["FilterValueId"]);
+				$j = 0;
+			    while($i + $j < count($array) - 1 && $array[$i + $j]["FilterId"] == $array[$i + 1 + $j]["FilterId"])
+				{
+					$query = $query . " or filtervalueid = " . intval( $array[$i + 1 + $j]["FilterValueId"]);
+					$j++;					
+				}
+				$i += $j;
+				$query = $query . ") AS t" . $i. "
+									USING ( id ) ";
+				$i++;
+			}
+		}
+			$query = $query . " group by id";
+			$children = SQL($query,$params)->getAll();
+			return $children;
+	}
 }
 
 ?>
