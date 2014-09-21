@@ -29,13 +29,12 @@ class Page
 		}
 		else
 		{
-			$children = $this->getChildren();//SQL('Select * from news where ParentId = ?',array($this->id))->getAll();
+			$children = $this->getChildren();
 			$content = array();
 			for ($i=0; $i < count($children); $i++) { 
 				array_push($content, array('title' => $children[$i]["Title"], 'id' => $children[$i]["Id"]));
 			}
-
-			//$this->createFilter();
+			$this->publishFilterMenu();
 			getView("Container.inc",$content);
 		}
 	}
@@ -87,6 +86,22 @@ class Page
 			$query = $query . " group by id";
 			$children = SQL($query,$params)->getAll();
 			return $children;
+	}
+
+	public function publishFilterMenu()
+	{
+		echo "<div id='filter'>";
+		$filters = SQL("Select * from filters")->getAll();
+		for ($i=0; $i < count($filters); $i++) { 
+			echo "<div><h4>" . $filters[$i]["Caption"] . "</h4>";
+
+			$filtervalues = SQL("Select * from filtervalues where filterId =?", array($filters[$i]['FilterId']))->getAll();
+			for ($j=0; $j <  count($filtervalues); $j++) { 
+				echo "<input id='".$filtervalues[$j]["FilterValueId"]."' type='checkbox' onclick='NewsModule.changeFiltersList(".$filtervalues[$j]["FilterValueId"].")' >".$filtervalues[$j]['Caption'] . "</input>";
+			}
+			echo "</div>";
+		}
+		echo "<input id='filterButton' type='button' value='filter' onclick='NewsModule.filter()'/></div>";
 	}
 }
 

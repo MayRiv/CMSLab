@@ -43,3 +43,8 @@ a {
 #menu div {
 	text-align: left;
 }
+#filter
+{
+	float:right;
+	width: 300px;
+}
