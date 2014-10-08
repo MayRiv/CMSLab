@@ -25,8 +25,10 @@ class Page
 
 		if (!$this->isContainer)
 		{
-			$content = array('title' =>$this->title,'body'=>$this->body );
+			$table = $this->getTable();
+			$content = array('title' =>$this->title,'body'=>$this->body, 'table' => $table );
 			getView("Content.inc",$content);
+			
 		}
 		else
 		{
@@ -39,7 +41,7 @@ class Page
 			getView("Container.inc",$content);
 		}
 	}
-	public function getChildren()
+	private function getChildren()
 	{
 		
 		$query = "Select * from(select * from news where parentId =  ?) as m0";
@@ -94,7 +96,7 @@ class Page
 			return $children;
 	}
 
-	public function publishFilterMenu()
+	private function publishFilterMenu()
 	{
 		echo "<div id='filter'>";
 		$filtervalueschecked = array();
@@ -118,6 +120,11 @@ class Page
 		}
 		echo "<input id='filterButton' type='button' value='filter' onclick='NewsModule.filter()'/></div>";
 	}
+
+	private function getTable()
+	{
+		return SQL("SELECT * FROM newstablevalues INNER JOIN tablevalues USING ( TableValueId ) WHERE NewsId =?", array($this->id))->getAll();
+	} 
 }
 
 ?>

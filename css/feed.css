@@ -52,3 +52,8 @@ a {
 {
 	margin: 10px;
 }
+
+table {
+	margin: auto;
+	border: 1px black solid;
+}
