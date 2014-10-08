@@ -8,6 +8,7 @@ class Page
 	public $sortField;
 	public $parentId;
 	public $isContainer;
+	public $author;
 	public function __construct($id)
 	{
 		$page = SQL('Select * from news where id = ?', array($id))->getAll()[0];
@@ -32,7 +33,7 @@ class Page
 			$children = $this->getChildren();
 			$content = array();
 			for ($i=0; $i < count($children); $i++) { 
-				array_push($content, array('title' => $children[$i]["Title"], 'id' => $children[$i]["Id"]));
+				array_push($content, array('title' => $children[$i]->title, 'id' => $children[$i]->id));
 			}
 			$this->publishFilterMenu();
 			getView("Container.inc",$content);
@@ -85,19 +86,33 @@ class Page
 		}
 			$query = $query . " group by id";
 			$children = SQL($query,$params)->getAll();
+			$pages = array();
+			for ($i=0; $i < count($children); $i++) { 
+				array_push($pages, new Page($children[$i]["Id"]));
+			}
+			return $pages;
 			return $children;
 	}
 
 	public function publishFilterMenu()
 	{
 		echo "<div id='filter'>";
+		$filtervalueschecked = array();
+		if (isset($_GET['f']))
+			$filtervalueschecked = explode('-', $_GET['f']);;
+
 		$filters = SQL("Select * from filters")->getAll();
 		for ($i=0; $i < count($filters); $i++) { 
 			echo "<div><h4>" . $filters[$i]["Caption"] . "</h4>";
 
 			$filtervalues = SQL("Select * from filtervalues where filterId =?", array($filters[$i]['FilterId']))->getAll();
 			for ($j=0; $j <  count($filtervalues); $j++) { 
-				echo "<input id='".$filtervalues[$j]["FilterValueId"]."' type='checkbox' onclick='NewsModule.changeFiltersList(".$filtervalues[$j]["FilterValueId"].")' >".$filtervalues[$j]['Caption'] . "</input>";
+				$checked = "";
+				$bool = in_array($filtervalues[$j]['FilterValueId'], $filtervalueschecked);
+				if ($bool)
+					$checked = "checked = true";
+				
+				echo "<input id='".$filtervalues[$j]["FilterValueId"]."' type='checkbox' ".$checked."  onclick='NewsModule.changeFiltersList(".$filtervalues[$j]["FilterValueId"].")' >".$filtervalues[$j]['Caption'] . "</input>";
 			}
 			echo "</div>";
 		}
