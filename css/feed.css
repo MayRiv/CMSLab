@@ -7,12 +7,17 @@ body {
 	*/
 	text-align:center;
 }
+div
+{
+	margin: 10px;
+
+}
 #header {
-	text-align:center;
-	
+	text-align:center;	
 }
 #content{
 	text-align:center;
+	margin: auto;
 }
 #footer{
 	text-align:center;
@@ -57,3 +62,37 @@ table {
 	margin: auto;
 	border: 1px black solid;
 }
+
+
+.lifted {
+02	           -moz-border-radius:4px;
+03	                border-radius:4px;
+04	       }
+05	 
+06	       .lifted:before,
+07	       .lifted:after {
+08	           bottom:15px;
+09	           left:10px;
+10	           width:50%;
+11	           height:20%;
+12	           max-width:300px;
+13	           max-height:100px;
+14	           -webkit-box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
+15	              -moz-box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
+16	                   box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
+17	           -webkit-transform:rotate(-3deg);
+18	              -moz-transform:rotate(-3deg);
+19	               -ms-transform:rotate(-3deg);
+20	                -o-transform:rotate(-3deg);
+21	                   transform:rotate(-3deg);
+22	       }
+23	 
+24	       .lifted:after {
+25	           right:10px;
+26	           left:auto;
+27	           -webkit-transform:rotate(3deg);
+28	              -moz-transform:rotate(3deg);
+29	               -ms-transform:rotate(3deg);
+30	                -o-transform:rotate(3deg);
+31	                   transform:rotate(3deg);
+32	       }

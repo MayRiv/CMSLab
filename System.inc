@@ -16,7 +16,9 @@ class System
 	
 	public function showPage($id)
 	{
+		ob_start();
 		
+	
 		echo "<html>
 				<head>
 					<link rel=\"stylesheet\" type=\"text/css\" href=\"css/feed.css\"/>
@@ -41,6 +43,7 @@ class System
 
 		echo "	</body>
 			  </html>";
+		ob_end_flush();
 	}
 	public function showHeader()
 	{

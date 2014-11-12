@@ -22,7 +22,11 @@ class Page
 	}
 	public function publish()
 	{
-
+		/*setcookie('test[0]',8);
+		foreach ($_COOKIE['test'] as $value) {
+			echo $value;
+		}*/
+		setcookie('path['.$this->id.']',$this->title);
 		if (!$this->isContainer)
 		{
 			$table = $this->getTable();
@@ -39,6 +43,20 @@ class Page
 			}
 			$this->publishFilterMenu();
 			getView("Container.inc",$content);
+		}
+		$this->showPath();
+	}
+	private function showPath()
+	{
+		
+		if(isset($_COOKIE['path']))
+		{
+			echo '<br/><br/>';
+			echo '<div> You visited: <br/>';
+			foreach ($_COOKIE['path'] as $key => $value) {
+				echo '<a href="/CMSLab/index.php?pageId='.$key.'">'.$value.'</a><br/>';
+			}
+			echo '</div>';
 		}
 	}
 	private function getChildren()
