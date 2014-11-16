@@ -22,17 +22,15 @@ class Page
 	}
 	public function publish()
 	{
-		/*setcookie('test[0]',8);
-		foreach ($_COOKIE['test'] as $value) {
-			echo $value;
-		}*/
+
 		setcookie('path['.$this->id.']',$this->title);
+
 		if (!$this->isContainer)
 		{
 			$table = $this->getTable();
-			$content = array('title' =>$this->title,'body'=>$this->body, 'table' => $table );
-			getView("Content.inc",$content);
+			$content = array('id' =>$this->id, 'title' =>$this->title,'body'=>$this->body, 'table' => $table );
 			
+			getView("Content.inc",$content);	
 		}
 		else
 		{
@@ -41,24 +39,12 @@ class Page
 			for ($i=0; $i < count($children); $i++) { 
 				array_push($content, array('title' => $children[$i]->title, 'id' => $children[$i]->id));
 			}
-			$this->publishFilterMenu();
+			$content['title'] = $this->title;
+			//$this->publishFilterMenu();
 			getView("Container.inc",$content);
 		}
-		$this->showPath();
 	}
-	private function showPath()
-	{
-		
-		if(isset($_COOKIE['path']))
-		{
-			echo '<br/><br/>';
-			echo '<div> You visited: <br/>';
-			foreach ($_COOKIE['path'] as $key => $value) {
-				echo '<a href="/CMSLab/index.php?pageId='.$key.'">'.$value.'</a><br/>';
-			}
-			echo '</div>';
-		}
-	}
+	
 	private function getChildren()
 	{
 		
@@ -114,30 +100,7 @@ class Page
 			return $children;
 	}
 
-	private function publishFilterMenu()
-	{
-		echo "<div id='filter'>";
-		$filtervalueschecked = array();
-		if (isset($_GET['f']))
-			$filtervalueschecked = explode('-', $_GET['f']);;
-
-		$filters = SQL("Select * from filters")->getAll();
-		for ($i=0; $i < count($filters); $i++) { 
-			echo "<div><h4>" . $filters[$i]["Caption"] . "</h4>";
-
-			$filtervalues = SQL("Select * from filtervalues where filterId =?", array($filters[$i]['FilterId']))->getAll();
-			for ($j=0; $j <  count($filtervalues); $j++) { 
-				$checked = "";
-				$bool = in_array($filtervalues[$j]['FilterValueId'], $filtervalueschecked);
-				if ($bool)
-					$checked = "checked = true";
-				
-				echo "<input id='".$filtervalues[$j]["FilterValueId"]."' type='checkbox' ".$checked."  onclick='NewsModule.changeFiltersList(".$filtervalues[$j]["FilterValueId"].")' >".$filtervalues[$j]['Caption'] . "</input>";
-			}
-			echo "</div>";
-		}
-		echo "<input id='filterButton' type='button' value='filter' onclick='NewsModule.filter()'/></div>";
-	}
+	
 
 	private function getTable()
 	{

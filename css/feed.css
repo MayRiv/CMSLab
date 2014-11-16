@@ -1,57 +1,61 @@
 body {
 	/*background-color: rgb(51,119,158);
-	*/background-image: ("Pictures\\bg.png");
+	background-image: ("Pictures\\bg.png");
 	background: #eceae8 url("Pictures\\bg.png");
 	/*font: 14px/20px Arial, Tahoma, Verdana, sans-serif;}
 
 	*/
 	text-align:center;
 }
+.Box {
+ /*
+width:700px; 
+height: 200px; /* Высота блока */
+background-color: #ffffff; /* Фоновый цвет*/
+border: 2px solid #D4D4D4; /* Ширина и цвет границ*/
+border-radius: 10px; /* Радиус границ*/
+box-shadow: 0 0 15px #A9A9A9; /* Размер и цвет тени блока*/
+ 
+}
+
 div
 {
 	margin: 10px;
-
+	display: inline-block;
 }
 #header {
+	padding-top: 10px;
 	text-align:center;	
+	display: block;
 }
 #content{
 	text-align:center;
 	margin: auto;
+	width: 70%;
+}
+#content div {
+	display: block;
 }
 #footer{
 	text-align:center;
+	display: block;
+	margin: 10% auto;
+	width: 70%;
 }
-.news_container {
-	text-align:center;
-	margin: 2px;
 
-	background: #fff;
-	-moz-border-radius: 0 6px 6px 6px;
-	-webkit-border-radius: 0 6px 6px 6px;
-	border-radius: 0 6px 6px 6px;
-	-moz-box-shadow: 0 -2px 3px -2px rgba(0,0,0,0.2), 2px 2px 2px rgba(0,0,0,0.1);
-	-webkit-box-shadow: 0 -2px 3px -2px rgba(0,0,0,0.2), 2px 2px 2px rgba(0,0,0,0.1);
-	box-shadow: 0 -2px 3px -2px rgba(0,0,0,0.2), 2px 2px 2px rgba(0,0,0,0.1);
-	background-color: white;
-	text-align:center;
-	margin: 0px auto;
-	width: 400px;
-}
-a {
-	
-}
 #menu {
 	float: left;
-	width: 300px;
+	/*width: 300px;*/
+	width: 10%;
 }
 #menu div {
 	text-align: left;
+	display: block;
 }
 #filter
 {
 	float:right;
-	width: 300px;
+	width: 10%;
 }
 .news
 {
@@ -63,36 +67,8 @@ table {
 	border: 1px black solid;
 }
 
-
-.lifted {
-02	           -moz-border-radius:4px;
-03	                border-radius:4px;
-04	       }
-05	 
-06	       .lifted:before,
-07	       .lifted:after {
-08	           bottom:15px;
-09	           left:10px;
-10	           width:50%;
-11	           height:20%;
-12	           max-width:300px;
-13	           max-height:100px;
-14	           -webkit-box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
-15	              -moz-box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
-16	                   box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
-17	           -webkit-transform:rotate(-3deg);
-18	              -moz-transform:rotate(-3deg);
-19	               -ms-transform:rotate(-3deg);
-20	                -o-transform:rotate(-3deg);
-21	                   transform:rotate(-3deg);
-22	       }
-23	 
-24	       .lifted:after {
-25	           right:10px;
-26	           left:auto;
-27	           -webkit-transform:rotate(3deg);
-28	              -moz-transform:rotate(3deg);
-29	               -ms-transform:rotate(3deg);
-30	                -o-transform:rotate(3deg);
-31	                   transform:rotate(3deg);
-32	       }
+ li {
+    list-style-type: none; /* Убираем маркеры */
+     display: inline;
+     margin: 10px;
+}

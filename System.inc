@@ -17,7 +17,7 @@ class System
 	public function showPage($id)
 	{
 		ob_start();
-		
+		session_start();
 	
 		echo "<html>
 				<head>
@@ -35,15 +35,55 @@ class System
 			$p = new Page($p->instanceOf);
 		}
 		$this->showHeader();
-		echo "<div id='menu'>";
+		echo "<div id='menu' class=\"Box\">";
 		$this->showMenu($this->getParents($id));
 		echo "</div>";
-		$p->publish();
+
+		if(!isset($_GET['fav']))
+		{
+			$p->publish();
+		}
+		else
+		{
+			$this->handleFavourites($p);			
+		}
+
+		
+
+		$this->showFilterMenu($p->isContainer);
 		$this->showFooter();
 
 		echo "	</body>
 			  </html>";
 		ob_end_flush();
+	}
+	private function handleFavourites($p)
+	{
+		if($_GET['fav'] =='add')
+		{
+			if(!isset($_SESSION['favourites']))
+			{
+				$_SESSION['favourites'] = array($p->id => 'title');
+			}
+			if(!in_array($p->id, $_SESSION['favourites']))
+			{
+				//array_push($_SESSION['favourites'], $id => 'lol');
+				$_SESSION['favourites'][$p->id] =  $p->title;
+			}
+			$p->publish();			
+		}
+
+		if ($_GET['fav'] == 'show')
+		{
+			$content = array();
+			foreach ($_SESSION['favourites'] as $key => $value) {
+				 array_push($content, array('title' => $value, 'id' => $key));
+			}
+			$content['title'] = 'Your favourites';
+			getView("Container.inc",$content);
+		}
+		
+
 	}
 	public function showHeader()
 	{
@@ -51,7 +91,9 @@ class System
 	}
 	public function showFooter()
 	{
-		getView("Footer.inc",null);
+		
+		getView("Footer.inc",$_COOKIE['path']);
+		
 	}
 
 	private function showMenu($parentPages, $parent = null, $level = 1)
@@ -74,6 +116,37 @@ class System
 				$this->showMenu($parentPages,$pages[$i], $level + 1);
 
 		}
+	}
+	private function showFilterMenu($isContainer)
+	{
+		$hidden = '';
+		if (!$isContainer)  $hidden = 'style="visibility:hidden"';
+		echo "<div id='filter' class='Box'".$hidden." >";
+
+		
+		$filtervalueschecked = array();
+		if (isset($_GET['f']))
+			$filtervalueschecked = explode('-', $_GET['f']);;
+
+			$filters = SQL("Select * from filters")->getAll();
+			for ($i=0; $i < count($filters); $i++) { 
+				echo "<div><h4>" . $filters[$i]["Caption"] . "</h4>";
+
+				$filtervalues = SQL("Select * from filtervalues where filterId =?", array($filters[$i]['FilterId']))->getAll();
+				for ($j=0; $j <  count($filtervalues); $j++) { 
+					$checked = "";
+					$bool = in_array($filtervalues[$j]['FilterValueId'], $filtervalueschecked);
+					if ($bool)
+						$checked = "checked = true";
+					
+					echo "<input id='".$filtervalues[$j]["FilterValueId"]."' type='checkbox' ".$checked."  onclick='NewsModule.changeFiltersList(".$filtervalues[$j]["FilterValueId"].")' >".$filtervalues[$j]['Caption'] . "</input>";
+				}
+
+				echo "</div>";
+			}
+			echo "<input id='filterButton' type='button' value='filter' onclick='NewsModule.filter()'/>";
+		
+		echo "</div>";
 	}
 	private function getParents($id)
 	{

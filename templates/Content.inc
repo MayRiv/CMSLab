@@ -1,5 +1,5 @@
-<div id="content">
-<h1><?=$obj["title"]?></h1>
+<div id="content" class='Box'>
+<h1><?=$obj["title"]?></h1><?php echo '<a href="/CMSLab/?pageId='.$obj['id'].'&fav=add">Add to Favourites</a>';?>
 <p><?=$obj["body"]?></p>
 <table>
 	<?php
@@ -11,4 +11,5 @@
 		}
 	?>
 </table>
+
 </div>

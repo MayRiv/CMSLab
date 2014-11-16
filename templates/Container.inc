@@ -1,7 +1,7 @@
 <?php
-echo '<div id="contentainer" class="lifted">';
-
-	for ($i=0; $i < count($obj); $i++) { 
+echo '<div id="content" class="Box" >';
+	echo '<h1>'.$obj['title'].'</h1>';
+	for ($i=0; $i < count($obj) - 1; $i++) { 
 		echo '<div class="news"><a href="?pageId='. $obj[$i]['id'] .'">'.$obj[$i]['title'].'</a></div>';
 		
 	}
