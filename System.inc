@@ -168,6 +168,8 @@ class System
 	private function getChildPages($parentPages, $parent = null)
 	{
 		$sortField = $parent["sortField"];
+		if (strlen($sortField) == 0)
+			$sortField = "title";
 		$query = "select * from  news where";
 		$params = array();
 		

@@ -51,13 +51,15 @@ class TreeTable extends Table
 			$temp = '';	
 			if(isset($_GET['parentId']))
 			{
-				$temp = $_GET['parentId'];		
+				$temp = $_GET['parentId'];
+				$from .= $this->parentField." = '$temp'";		
 			}
 			else
 			{
-				$temp = $this->defaultParentId;		
+				//$temp = $this->defaultParentId;
+				$from .= "ISNULL(".$this->parentField.")";		
 			}
-			$from .= $this->parentField." = '$temp'";//' and ';
+			//' and ';
 		}
 		DBManager::getInstance()->connect("localhost", "maynews", "root", "");
 		$rows = SQL($select.$what.$from)->getAll();
@@ -71,11 +73,12 @@ class TreeTable extends Table
 			}
 			else
 			{
-				$mId = '&parentId='.$this->defaultParentId;
+				//$mId = '&parentId='.$this->defaultParentId;
+				$mId = '&ISNULL(parentId)';
 			}
 		}
 
-		echo "<a class='addlink' href = '".$this->scriptName."?action=insert".$mId."''><img src='images/add_icon.png'> <span>Додати новий запис</span></a>";
+		echo "<a class='addlink' href = '".$this->scriptName."?action=insert".$mId."''><img src='Pictures/add.png'> <span>Додати новий запис</span></a>";
 		echo "<table class = 'browsetable'>";
 		echo "<tr id='tablecaption'>";
 		if(isset($this->parentField) && isset($_GET['parentId']))
@@ -104,11 +107,11 @@ class TreeTable extends Table
 		{
 			echo "<tr>";
 			echo "<td class = 'changelink'>";
-			echo "<a href = '".$this->scriptName."?action=edit&id=".$this->getPrimaryKeyValueFrom($row)."'><img src='images/edit_icon.png'></a>";
+			echo "<a href = '".$this->scriptName."?action=edit&id=".$this->getPrimaryKeyValueFrom($row)."'><img src='Pictures/edit.png'></a>";
 			echo "</td>";
 			echo "<td class = 'deletelink'>";
 			$t = "onclick=\"return confirm('Видалити запис?')\"";
-			echo "<a href = '".$this->scriptName."?action=delete&id=".$this->getPrimaryKeyValueFrom($row)."'".$t." ><img src='images/delete_icon.png'></a>";
+			echo "<a href = '".$this->scriptName."?action=delete&id=".$this->getPrimaryKeyValueFrom($row)."'".$t." ><img src='Pictures/delete.png'></a>";
 			echo "</td>";
 
 			if(isset($this->parentField))
@@ -203,11 +206,15 @@ class TreeTable extends Table
 			$refId = SQL($query)->next();
 			if(isset($refId))
 			{
+				if (null == ($refId[$this->parentField]))
+					$reference .= '?ISNULL(parentId)';
+				else	
 				$reference.='?parentId='.$refId[$this->parentField];
 			}
 			else
 			{
-				$reference .='?parentId='.$this->defaultParentId;
+				//$reference .='?parentId='.$this->defaultParentId;
+				$reference .= '?ISNULL(parentId)';
 			}
 		}
 		return $reference;
