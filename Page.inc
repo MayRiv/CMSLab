@@ -15,7 +15,7 @@ class Page
 		$this->id = $id;
 		$this->body =$page['Body'];
 		$this->title = $page['Title'];
-		$this->instanceOf = $page['InstanceOf'];
+		//$this->instanceOf = $page['InstanceOf'];
 		$this->parentId = $page['ParentId'];
 		$this->sortField = $page['sortField'];
 		$this->isContainer = $page['IsContainer'];

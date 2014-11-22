@@ -17,6 +17,7 @@ class Field
 	private $lookupVariants;
 	private $lookupInfo;
 
+
 	public function __construct($name, $type, $caption, $formPrefix, 
 		$cssClass, $defaultValue = "", $isVisibleBr = true, $isVisible = true, $value = "",  
 		$isAutoInc = false)
@@ -41,7 +42,8 @@ class Field
 					? ", ".$this->lookupInfo['captionfield'] 
 					: "";
 
-			DBManager::getInstance()->connect("localhost", "cmsdb", "root", "");
+			DBManager::getInstance()->connect("localhost", "maynews", "root", "");
+
 			$this->lookupVariants =  SQL("select ".$this->lookupInfo['field'].$captionfield." from ".$this->lookupInfo['table'])->getAll();
 
 			if($this->lookupInfo['isRequired'] == false)
@@ -55,49 +57,65 @@ class Field
 		}
 	}
 	
-	public function createControl()
+	public function createControl($myValue = null, $findValue = null)
 	{
 		$t = $this->type;
+		$value = $this->getHTMLValue();
+		if(is_null($myValue) == false)
+		{
+			$value = $myValue;
+		}
+
 		switch($t)
 		{
 			case "bool":
 			{
-				return '<input type = "checkbox" name = "'.$this->formPrefix.$this->name.'" class = "'.$this->cssClass.'" checked = "'.$this->getHTMLValue().'" />';
+				return '<input type = "checkbox" name = "'.$this->formPrefix.$this->name.'" class = "'.$this->cssClass.'" checked = "'.$value.'" />';
 				break;
 			}
 			case "date":
 			{
-				return '<input type = "datetime" name = "'.$this->formPrefix.$this->name.'" class = "'.$this->cssClass.'" value = "'.$this->getHTMLValue().'" />';
+				return '<input type = "datetime" name = "'.$this->formPrefix.$this->name.'" class = "'.$this->cssClass.'" value = "'.$value.'" />';
 				break;
 			}
 			case "text":
 			{
-				return '<textarea name="'.$this->formPrefix.$this->name.'">'.$this->getHTMLValue().'</textarea>';
+				return '<textarea name="'.$this->formPrefix.$this->name.'">'.$value.'</textarea>';
 				break;
 			}
 			case "html":
 			{
 				return "<textarea class = 'ckeditor' name='".$this->formPrefix.$this->name."' rows = '10' cols = '70'>"
-				.$this->getHTMLValue()."</textarea>";				
+				.$value."</textarea>";				
 				break;
 			}
 			case "lookup":
 			{
 				$result = "<select name = '".$this->formPrefix.$this->name."' class = '".$this->cssClass."'>";
-			
-				foreach ($this->lookupVariants as $variant) 
+				if(!is_null($findValue) && !is_null($myValue) && $this->name == $findValue)
 				{
-					$result .= "<option value='".$variant[$this->lookupInfo['field']]."'>"
+					foreach ($this->lookupVariants as $variant) 
+					{
+						$t = ($variant[$this->lookupInfo['field']] == $myValue) ? 'selected' : '' ;						
+						$result .= "<option value='".$variant[$this->lookupInfo['field']]."' ".$t." >"
 											.$variant[$this->getLookupCaption()]."</option>";						
-				}						
-				
+					}		
+				}
+				else
+				{
+					foreach ($this->lookupVariants as $variant) 
+					{
+						$result .= "<option value='".$variant[$this->lookupInfo['field']]."'>"
+											.$variant[$this->getLookupCaption()]."</option>";						
+					}		
+				}	
 				$result .= "</select>"; 
 				return $result;
 				break;
 			}
 			default:
 			{
-				return '<input type = "textbox" name = "'.$this->formPrefix.$this->name.'" class = "'.$this->cssClass.'" value = "'.$this->getHTMLValue().'" />';
+				return '<input type = "textbox" name = "'.$this->formPrefix.$this->name.'" class = "'.$this->cssClass.'" value = "'.$value.'" />';
 			}
 		}
 		

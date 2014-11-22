@@ -23,6 +23,7 @@ class System
 				<head>
 					<link rel=\"stylesheet\" type=\"text/css\" href=\"css/feed.css\"/>
 					<meta http-equiv = \"content-language\" content = \"ru\" />
+					<meta charset=\"UTF-8\"/>
 					<script src=\"js/script.js\".>
 					</script>
 				</head>
@@ -30,10 +31,10 @@ class System
 
 		
 		$p = new Page($id);
-		while($p->instanceOf != null)
+		/*while($p->instanceOf != null)
 		{
 			$p = new Page($p->instanceOf);
-		}
+		}*/
 		$this->showHeader();
 		echo "<div id='menu' class=\"Box\">";
 		$this->showMenu($this->getParents($id));
@@ -67,7 +68,7 @@ class System
 			}
 			if(!in_array($p->id, $_SESSION['favourites']))
 			{
-				//array_push($_SESSION['favourites'], $id => 'lol');
+				
 				$_SESSION['favourites'][$p->id] =  $p->title;
 			}
 			$p->publish();			
@@ -76,8 +77,11 @@ class System
 		if ($_GET['fav'] == 'show')
 		{
 			$content = array();
-			foreach ($_SESSION['favourites'] as $key => $value) {
-				 array_push($content, array('title' => $value, 'id' => $key));
+			if(isset($_SESSION['favourites']))
+			{
+				foreach ($_SESSION['favourites'] as $key => $value) {
+					 array_push($content, array('title' => $value, 'id' => $key));
+				}
 			}
 			$content['title'] = 'Your favourites';
 			getView("Container.inc",$content);
@@ -102,9 +106,9 @@ class System
 		$pages = $this->getChildPages($parentPages, $parent);
 
 		for ($i=0; $i < count($pages); $i++) { 
-			if ($pages[$i]["InstanceOf"] != null)
+			/*if ($pages[$i]["InstanceOf"] != null)
 				$page = new Page($pages[$i]["InstanceOf"]);
-			else 
+			else*/ 
 				$page = new Page($pages[$i]["Id"]);
 		
 			$title = $page->title;
